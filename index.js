@@ -10,7 +10,13 @@ const bcrypt = require('bcrypt')
 
 const jwt = require('jsonwebtoken')
 
-const User = require('./userModel')
+const User = require('./models/userModel')
+const Category = require('./models/modelCategory')
+const Product = require('./models/productModel')
+
+const { sendForgotPasswordEmail, validEmail } = require('./sendMail')
+const { handleGetAllUsers, handleUserRegistration, handleCreateCategory, handleCreateProduct, handleBrowseProducts, handleProductById, handlePlaceOrder } = require('./Controllers')
+const { validateRegister, authorization, isAdmin } = require('./middleware')
 
 
 
@@ -34,45 +40,7 @@ mongoose
     })
 
 
-app.post('/register', async (req, res) => {
-
-        try {
-            const { email, password, firstName, lastName } = req.body
-
-            if (!email) {
-                return res.status(400).json({ message: 'Email is required' })
-            }
-            if (!password) {
-                return res.status(400).json({ message: 'Password is required' })
-            }
-
-            const existingUser = await User.findOne({ email })
-            if (existingUser) {
-                return res.status(400).json({ message: 'User already exists' })
-            }
-
-            if (password.length < 6) {
-                return res.status(400).json({ message: 'Password must be at least 6 characters long' })
-            }
-
-            const hashedPassword = await bcrypt.hash(password, 12)
-
-            const newUser = new User({
-                email,
-                password: hashedPassword,
-                firstName,
-                lastName
-            })
-
-            await newUser.save()
-
-            res.status(201).json({ message: 'User registered successfully' })
-        }
-        catch (error) {
-            console.error('Internal server error while registering user:')
-            res.status(500).json({ message: error.message })
-        }
-    })
+app.post('/register', validateRegister, handleUserRegistration)
 
 app.post('/login', async (req, res) => {
     try {
@@ -122,3 +90,76 @@ app.post('/login', async (req, res) => {
         res.status(500).json({ message: error.message })
     }
 })
+
+app.post('/forgot-password', async (req, res) => {
+    try {
+        const { email } = req.body
+
+        if (!email) {
+            return res.status(400).json({ message: 'Email is required' })
+        }
+
+        const user = await User.findOne({ email })
+        if (!user) {
+            return res.status(404).json({ message: 'User account does not exist' })
+        }
+        
+        const accessToken = jwt.sign(
+            { user }, 
+            `${process.env.ACCESS_TOKEN}`, 
+            { expiresIn: '5m' }
+        )
+        await sendForgotPasswordEmail(email, accessToken)
+
+        res.status(200).json({ message: 'Password reset link sent to your email' })
+    } catch (error) {
+        console.error('Internal server error while processing forgot password request:')
+        res.status(500).json({ message: error.message })
+    }
+})
+
+app.patch('/reset-password', async (req, res) => {
+    try {
+        const { email, newPassword } = req.body
+
+        if (!email) {
+            return res.status(400).json({ message: 'Email is required' })
+        }
+        if (!newPassword) {
+            return res.status(400).json({ message: 'New password is required' })
+        }
+
+        const user = await User.findOne({ email })
+        if (!user) {
+            return res.status(404).json({ message: 'User account does not exist' })
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 12)
+        user.password = hashedPassword
+        await user.save()
+
+        res.status(200).json({ message: 'Password reset successfully' })
+    } catch (error) {
+        console.error('Internal server error while resetting password:')
+        res.status(500).json({ message: error.message })
+    }
+})
+
+// MVC -R
+// Model Controller Routes Middleware
+
+// Middlewares / Authorization / Validations
+
+// Deploy
+
+app.get('/all-users', authorization, isAdmin, handleGetAllUsers)
+
+app.post('/create-category', authorization, isAdmin, handleCreateCategory)
+
+app.post('/create-product', authorization, isAdmin, handleCreateProduct)
+
+app.get('/browse-products', authorization, handleBrowseProducts)
+
+app.get('/browse-products/:id', authorization, handleProductById)
+
+app.post('/place-order', authorization, handlePlaceOrder)
