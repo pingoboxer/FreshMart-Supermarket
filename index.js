@@ -15,8 +15,9 @@ const Category = require('./models/modelCategory')
 const Product = require('./models/productModel')
 
 const { sendForgotPasswordEmail, validEmail } = require('./sendMail')
-const { handleGetAllUsers, handleUserRegistration, handleCreateCategory, handleCreateProduct, handleBrowseProducts, handleProductById, handlePlaceOrder } = require('./Controllers')
+const { handleGetAllUsers, handleUserRegistration, handleCreateCategory, handleCreateProduct, handleBrowseProducts, handleProductById, handlePlaceOrder, handleMyOrders } = require('./Controllers')
 const { validateRegister, authorization, isAdmin } = require('./middleware')
+const Order = require('./models/order')
 
 
 
@@ -163,3 +164,7 @@ app.get('/browse-products', authorization, handleBrowseProducts)
 app.get('/browse-products/:id', authorization, handleProductById)
 
 app.post('/place-order', authorization, handlePlaceOrder)
+
+app.get('/view-my-orders', authorization, handleMyOrders)
+
+

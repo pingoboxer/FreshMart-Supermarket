@@ -161,12 +161,18 @@ const handlePlaceOrder = async (req, res) => {
         let totalAmount = 0;
         const orderItems = [];
 
-        for (const product of products) {
-            const product = await Product.findById(products.product);
-            if (!product) return res.status(404).json({ message: 'Product not found' })
+        for (const item of products) {
+
+            const product = await Product.findById(item.product)
+
+            if (!product) { 
+                return res.status(404).json({ message: 'Product not found' })
+            }
+
             if (product.stock < product.quantity) {
                 return res.status(400).json({ message: `Insufficient stock for ${product.name}` });
             }
+            
             if (product.quantity <= 0) {
                 return res.status(400).json({ message: 'Quantity must be greater than zero' });
             }
@@ -196,6 +202,22 @@ const handlePlaceOrder = async (req, res) => {
     }
 }
 
+ const handleMyOrders = async (req, res) => {
+    try {
+        const userId = req.user.id
+        const orders = await Order.find({ user: userId }).populate('products.product')
+
+        if (!orders || orders.length === 0) {
+            return res.status(404).json({ message: 'No orders found for this user' })
+        }
+
+        res.status(200).json(orders)
+    } catch (error) {
+        console.error('Internal server error while fetching user orders:')
+        res.status(500).json({ message: error.message })
+    }
+}
+
 module.exports = {
     handleGetAllUsers,
     handleUserRegistration,
@@ -203,6 +225,7 @@ module.exports = {
     handleCreateProduct,
     handleBrowseProducts,
     handleProductById,
-    handlePlaceOrder
+    handlePlaceOrder,
+    handleMyOrders
 }
 
