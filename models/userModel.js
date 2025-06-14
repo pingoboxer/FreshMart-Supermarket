@@ -6,6 +6,7 @@ const userSchema = new mongoose.Schema({
     firstName: { type: String, default: "", trim: true },
     lastName: { type: String, default: "", trim: true },
     role: { type: String, enum: ['user', 'admin'], default: "user" },
+    orders: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Order' }],
     verified: {type: Boolean, default: false}
 }, { timestamps: true })
 

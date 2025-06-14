@@ -1,3 +1,4 @@
+const User = require("../models/userModel");
 const { validEmail } = require("../sendMail")
 
 const jwt = require('jsonwebtoken')
@@ -79,9 +80,30 @@ const isRegularUser = async (req, res, next) => {
     next();
 }
 
+const validateOrder = (req, res, next) => {
+  const { products } = req.body;
+
+  if (!products || !Array.isArray(products) || products.length === 0) {
+    return res.status(400).json({ message: 'Products must be a non-empty array' });
+  }
+
+  for (const item of products) {
+    if (!item.product || !item.quantity) {
+      return res.status(400).json({ message: 'Each product must have a product ID and quantity' });
+    }
+    if (typeof item.quantity !== 'number' || item.quantity <= 0) {
+      return res.status(400).json({ message: 'Quantity must be a number greater than 0' });
+    }
+  }
+
+  next();
+}
+
+
 module.exports = {
     validateRegister,
     authorization,
     isAdmin,
-    isRegularUser
+    isRegularUser,
+    validateOrder
 }

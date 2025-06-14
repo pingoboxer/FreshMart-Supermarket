@@ -30,14 +30,13 @@ const findProductService = async () => {
     }
 }
 
-const findProductByIdService = async (req, res) => {
+const findProductByIdService = async (productId) => {
     try {
-        const productId = req.params.Id
         const product = await Product.findById(productId).populate('category', 'name')
         if (!product) {
             return res.status(404).json({ message: 'Product not found' })
         }
-        res.status(200).json({ product })
+        return { status: 200, data: product }
     } catch (error) {
         console.error('Internal server error while fetching product details:', error)
         res.status(500).json({ message: error.message })
