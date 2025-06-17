@@ -51,6 +51,7 @@ https://documenter.getpostman.com/view/44323489/2sB2x8DqxE
 
 
    EMAIL_USER = your-secret-admin-email-for-sending-user-emails
+
    EMAIL_PASS = your-secret-admin-email-password
 
    ADMIN_EMAIL = ['yourvariousadminemails@gmail.com']
@@ -63,6 +64,7 @@ https://documenter.getpostman.com/view/44323489/2sB2x8DqxE
 Base URL: https://freshmart-supermarket.onrender.com
 
 🔐 Auth Routes
+
 POST /api/register – Register new user
 
 POST /api/login – Login
@@ -70,21 +72,24 @@ POST /api/login – Login
 POST /api/forgot-password – Request password reset
 
 🛒 Product Routes
-GET /browse-products – Get all products
 
-GET /browse-products/:id – Get a specific product by ID
+GET /api/browse-products – Get all products
+
+GET /api/browse-products/:id – Get a specific product by ID
 
 👨‍💼 Admin Routes
-GET /admin/all-users – Get all users
 
-POST /admin/create-category – Create category
+GET /api/all-users – Get all users
 
-POST /admin/create-product – Create product in category
+POST /api/create-category – Create category
+
+POST /api/create-product – Create product in category
 
 📦 Order Routes
-POST /place-order – Place an order
 
-GET /orders/view-my-orders – View current user’s orders
+POST /api/place-order – Place an order
+
+GET /api/view-my-orders – View current user’s orders
 
 📜 License
 None
