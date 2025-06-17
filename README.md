@@ -26,6 +26,7 @@ https://documenter.getpostman.com/view/44323489/2sB2x8DqxE
 - JWT for Authentication
 - bcrypt for Password Hashing
 - dotenv for Environment Variables
+- cors for Resource Sharing
 
 ## 🚀 Installation
 
