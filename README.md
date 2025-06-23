@@ -93,7 +93,7 @@ POST /api/place-order – Place an order
 GET /api/view-my-orders – View current user’s orders
 
 📜 License
-None
+This project is licensed under the MIT License
 
 👤 Author
 Kpamor Raphael
