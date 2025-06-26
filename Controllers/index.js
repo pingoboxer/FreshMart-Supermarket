@@ -376,6 +376,30 @@ const handleMyOrders = async (req, res) => {
     }
 }
 
+const handleRestockProduct = async (req, res) => {
+    try {
+        const productId = req.params.id
+        const { quantity } = req.body
+
+        if (!productId || !quantity) {
+            return res.status(400).json({ message: 'Product ID and quantity are required' })
+        }
+
+        const product = await Product.findById(productId)
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' })
+        }
+
+        product.stock += quantity
+        await product.save()
+
+        res.status(200).json({ message: 'Product restocked successfully', product })
+    } catch (error) {
+        console.error('Internal server error while restocking product:', error)
+        res.status(500).json({ message: error.message })
+    }
+}   
+
 module.exports = {
     handleLogin,
     handleForgotPassword,
@@ -387,6 +411,7 @@ module.exports = {
     handleBrowseProducts,
     handleProductById,
     handlePlaceOrder,
-    handleMyOrders
+    handleMyOrders,
+    handleRestockProduct
 }
 
