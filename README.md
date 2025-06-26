@@ -86,6 +86,8 @@ POST /api/create-category – Create category
 
 POST /api/create-product – Create product in category
 
+PUT /api/restock-product - Restock depleted products
+
 📦 Order Routes
 
 POST /api/place-order – Place an order
