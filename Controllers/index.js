@@ -398,7 +398,77 @@ const handleRestockProduct = async (req, res) => {
         console.error('Internal server error while restocking product:', error)
         res.status(500).json({ message: error.message })
     }
-}   
+} 
+
+const handleModifyProduct = async (req, res) => {
+    try {
+        const productId = req.params.id
+        const { name, price, category, description, stock } = req.body
+
+        if (!productId) {
+            return res.status(400).json({ message: 'Product ID is required' })
+        }
+
+        const product = await Product.findById(productId)
+
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' })
+        }
+        if (name) {
+            product.name = name
+        }
+        if (price) {
+            if (typeof price !== 'number' || price <= 0) {
+                return res.status(400).json({ message: 'Price must be a positive number' })
+            }
+            product.price = price
+        }
+        if (category) {
+            const existingCategory = await Category.findOne({ name: category })
+            if (!existingCategory) {
+                return res.status(404).json({ message: 'Category not found' })
+            }
+            product.category = existingCategory._id
+        }
+        if (description) {
+            product.description = description
+        }
+        if (typeof stock !== 'undefined') {
+            if (typeof stock !== 'number' || stock < 0) {
+                return res.status(400).json({ message: 'Stock must be a non-negative number' })
+            }
+            product.stock = stock
+        }
+        await product.save()
+        res.status(200).json({ message: 'Product modified successfully', product })
+    } catch (error) {
+        console.error('Internal server error while modifying product:', error)
+        res.status(500).json({ message: error.message })
+    }
+}
+
+const handleDeleteProduct = async (req, res) => {
+    try {
+        const productId = req.params.id
+
+        if (!productId) {
+            return res.status(400).json({ message: 'Product ID is required' })
+        }
+
+        const product = await Product.findById(productId)
+
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' })
+        }
+
+        await product.deleteOne()
+
+        res.status(200).json({ message: 'Product deleted successfully' })
+    } catch (error) {
+        console.error('Internal server error while deleting product:', error)
+        res.status(500).json({ message: error.message })
+    }
+}
 
 module.exports = {
     handleLogin,
@@ -412,6 +482,8 @@ module.exports = {
     handleProductById,
     handlePlaceOrder,
     handleMyOrders,
-    handleRestockProduct
+    handleRestockProduct,
+    handleModifyProduct,
+    handleDeleteProduct
 }
 

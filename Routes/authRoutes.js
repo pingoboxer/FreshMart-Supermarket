@@ -2,7 +2,7 @@
 const express = require('express')
 
 const { sendForgotPasswordEmail, validEmail } = require('../sendMail')
-const { handleGetAllUsers, handleUserRegistration, handleCreateCategory, handleCreateProduct, handleBrowseProducts, handleProductById, handlePlaceOrder, handleMyOrders, handleLogin, handleForgotPassword, handleResetPassword, handleRestockProduct } = require('../Controllers')
+const { handleGetAllUsers, handleUserRegistration, handleCreateCategory, handleCreateProduct, handleBrowseProducts, handleProductById, handlePlaceOrder, handleMyOrders, handleLogin, handleForgotPassword, handleResetPassword, handleRestockProduct, handleModifyProduct, handleDeleteProduct } = require('../Controllers')
 const { validateRegister, authorization, isAdmin, validateOrder } = require('../middleware')
 
 
@@ -38,5 +38,9 @@ router.post('/place-order', authorization, validateOrder, handlePlaceOrder)
 router.get('/view-my-orders', authorization, handleMyOrders)
 
 router.put('/restock-product/:id', authorization, isAdmin, handleRestockProduct)
+
+router.patch('/modify-product/:id', authorization, isAdmin, handleModifyProduct)
+
+router.delete('/delete-product/:id', authorization, isAdmin, handleDeleteProduct)
 
 module.exports = router
