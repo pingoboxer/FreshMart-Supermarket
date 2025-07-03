@@ -86,11 +86,11 @@ POST /api/create-category – Create category
 
 POST /api/create-product – Create product in category
 
-PUT /api/restock-product:id - Restock depleted products
+PUT /api/restock-product/:id - Restock depleted products
 
-PATCH /api/modify-product:id - Modify an existing product
+PATCH /api/modify-product/:id - Modify an existing product
 
-DELETE /api/
+DELETE /api/delete-product/:id - Delete an existing product
 
 📦 Order Routes
 
